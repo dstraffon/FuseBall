@@ -247,10 +247,10 @@ FB.Renderer = class {
     ctx.font = `${14 * s}px system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
     const by = this.canvas.height - Math.max(18 * s, (v.oy - 40 * v.scale));
-    ctx.fillText(
-      `You: #${u.index + 1}  ·  Speed ${u.speed}  ·  Power ${u.power}  ·  Hit Reset ${u.hitReset.toFixed(1)}s  ·  WASD move, Space pulse`,
-      cx, by,
-    );
+    const help = u.controlled
+      ? `You: #${u.index + 1}  ·  Speed ${u.speed}  ·  Power ${u.power}  ·  Hit Reset ${u.hitReset.toFixed(1)}s  ·  WASD move, Space pulse, B watch bots`
+      : 'Watching bots  ·  Press B to take control of Blue #5';
+    ctx.fillText(help, cx, by);
 
     if (game.state === 'goal') {
       const team = FB.CONFIG.teams[game.lastScorer];
