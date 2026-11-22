@@ -28,6 +28,7 @@ FB.Game = class {
 
     this.user = this.players[C.userRosterIndex]; // a Blue circle
     this.user.controlled = true;
+    this.ai = new FB.AI(this);
     this.kickoff();
   }
 
@@ -61,18 +62,30 @@ FB.Game = class {
       this.ball.vy *= hold;
     }
 
-    // Movement. Only the user's circle moves for now; bots come next.
+    // Movement: the user steers their circle, bots steer the rest.
+    const playing = this.state === 'playing';
+    const cmds = playing ? this.ai.update(dt) : null;
     for (const p of this.players) {
       let dx = 0;
       let dy = 0;
-      if (p.controlled && this.state === 'playing') {
-        [dx, dy] = this.input.moveVector();
+      if (playing) {
+        if (p.controlled) {
+          [dx, dy] = this.input.moveVector();
+        } else {
+          const c = cmds.get(p);
+          if (c) ({ dx, dy } = c);
+        }
       }
       p.update(dt, dx, dy);
     }
 
-    if (this.state === 'playing' && this.input.pulseHeld()) {
-      this.user.pulse(this.ball, this.players);
+    if (playing) {
+      if (this.user.controlled && this.input.pulseHeld()) {
+        this.user.pulse(this.ball, this.players);
+      }
+      for (const [p, c] of cmds) {
+        if (c.pulse) p.pulse(this.ball, this.players);
+      }
     }
 
     this.ball.update(dt, phys);

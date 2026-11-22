@@ -8,6 +8,12 @@
 
   FB.game = game; // handy for poking at state from the browser console
 
+  // B hands your circle to a bot (and back), so you can watch bots play.
+  // The main menu in the next step will replace this.
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyB' && !e.repeat) game.user.controlled = !game.user.controlled;
+  });
+
   let last = performance.now();
   let acc = 0;
 

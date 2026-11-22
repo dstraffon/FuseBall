@@ -10,6 +10,7 @@ Open `index.html` in any modern browser. There is nothing to install or build.
 | --- | --- |
 | W A S D | Move your circle |
 | Space | Send out a pulse |
+| B | Hand your circle to a bot and watch (press again to take it back) |
 
 The pulse pushes the ball away from your circle, so line up behind the ball in the direction you want it to go. It also knocks back and briefly stuns nearby circles on the other team.
 
@@ -31,6 +32,7 @@ Each team has one goalie, which can't leave its semicircle.
 | `js/field.js` | Walls, goals, posts and the goalie area |
 | `js/player.js` | A circle: movement, knockback and the pulse |
 | `js/ball.js` | The ball |
+| `js/ai.js` | Bot brains: chasing, passing, shooting, formation and goalkeeping |
 | `js/game.js` | Game state, collisions, goals and kickoff |
 | `js/render.js` | Drawing the field, circles and scoreboard |
 | `js/input.js` | Keyboard input |
@@ -38,4 +40,4 @@ Each team has one goalie, which can't leave its semicircle.
 
 ## Status
 
-This is the first step: the field, physics and one circle you control. Bot players, the match clock with halves, and the menus are coming next.
+Done so far: the field, physics, one circle you control, and bots for every other circle. The match clock with halves and the menus are coming next.
