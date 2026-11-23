@@ -7,7 +7,36 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <canvas id="game"></canvas>
+  <canvas id="game" tabindex="-1"></canvas>
+
+  <!-- Main menu. A bots-only match plays behind it. -->
+  <div id="menu" class="overlay">
+    <div class="panel">
+      <h1>Fuseball</h1>
+      <p class="tagline">Six circles a side. Pulse the ball into the other goal.</p>
+      <button data-action="play" autofocus>Play with bots</button>
+      <button data-action="watch" class="secondary">Watch bots</button>
+      <p class="controls">WASD to move · Space to pulse · Esc to pause</p>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden">
+    <div class="panel">
+      <h2>Paused</h2>
+      <button data-action="resume">Resume</button>
+      <button data-action="restart" class="secondary">Restart match</button>
+      <button data-action="exit" class="secondary">Exit to main menu</button>
+    </div>
+  </div>
+
+  <div id="fulltime" class="overlay hidden">
+    <div class="panel">
+      <h2>Full time</h2>
+      <p id="final-score" class="final"></p>
+      <button data-action="restart">Play again</button>
+      <button data-action="exit" class="secondary">Main menu</button>
+    </div>
+  </div>
 
   <script src="js/config.js"></script>
   <script src="js/vec.js"></script>

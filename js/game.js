@@ -1,14 +1,20 @@
 // Game state and the fixed-step simulation.
 FB.Game = class {
-  constructor(input) {
+  // mode: 'play' (the user controls Blue #5) or 'watch' (bots only).
+  constructor(input, mode = 'play') {
     const C = FB.CONFIG;
     this.input = input;
+    this.mode = mode;
     this.field = new FB.Field(C.field);
     this.ball = new FB.Ball(C.physics.ballRadius);
     this.players = [];
     this.score = [0, 0];
-    this.state = 'playing'; // 'playing' | 'goal'
+    // 'playing' | 'goal' | 'halftime' | 'fulltime'
+    this.state = 'playing';
     this.stateTimer = 0;
+    this.paused = false;
+    this.half = 1;
+    this.clock = C.match.halfLength; // seconds left in this half
     this.lastScorer = -1;
     this.time = 0;
 
@@ -21,13 +27,14 @@ FB.Game = class {
           speed: slot.speed,
           power: slot.power,
           hitReset: slot.hitReset,
+          pattern: slot.pattern,
           home: this.homePosition(team, slot),
         }));
       });
     }
 
     this.user = this.players[C.userRosterIndex]; // a Blue circle
-    this.user.controlled = true;
+    this.user.controlled = mode === 'play';
     this.ai = new FB.AI(this);
     this.kickoff();
   }
@@ -51,7 +58,34 @@ FB.Game = class {
 
   step(dt) {
     const phys = FB.CONFIG.physics;
+    const match = FB.CONFIG.match;
+    if (this.paused || this.state === 'fulltime') return;
     this.time += dt;
+
+    if (this.state === 'halftime') {
+      // Everyone waits; the second half starts with a fresh kickoff.
+      this.stateTimer -= dt;
+      if (this.stateTimer <= 0) {
+        this.half = 2;
+        this.clock = match.halfLength;
+        this.kickoff();
+      }
+      return;
+    }
+
+    if (this.state === 'playing') {
+      // The clock stops while the goal banner shows.
+      this.clock = Math.max(0, this.clock - dt);
+      if (this.clock === 0) {
+        if (this.half === 1) {
+          this.state = 'halftime';
+          this.stateTimer = match.halftimePause;
+        } else {
+          this.state = 'fulltime';
+        }
+        return;
+      }
+    }
 
     if (this.state === 'goal') {
       this.stateTimer -= dt;
