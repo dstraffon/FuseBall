@@ -1,7 +1,7 @@
 // A circle on the field. Its velocity has two parts: the movement it
 // chooses (mv) and knockback it receives from pulses and collisions (kv).
 FB.Player = class {
-  constructor({ team, index, role, speed, power, hitReset, home }) {
+  constructor({ team, index, role, speed, power, hitReset, pattern, home }) {
     const pc = FB.CONFIG.player;
     const st = FB.CONFIG.stats;
     this.team = team;
@@ -10,6 +10,7 @@ FB.Player = class {
     this.speed = speed;       // stat, 1 to 10
     this.power = power;       // stat, 1 to 10
     this.hitReset = hitReset; // stat, seconds between pulses
+    this.pattern = pattern;   // look of the circle, see Renderer.drawPattern
     this.home = home;         // kickoff position
     this.r = pc.radius;
     this.maxSpeed = st.speedBase + st.speedPerPoint * speed;

@@ -30,7 +30,8 @@ FB.Renderer = class {
     };
   }
 
-  draw(game) {
+  // backdrop: true when drawn behind the main menu, so the HUD is hidden.
+  draw(game, backdrop = false) {
     const ctx = this.ctx;
     const field = game.field;
     const v = this.view(field);
@@ -46,7 +47,7 @@ FB.Renderer = class {
     for (const p of game.players) this.drawPlayer(p);
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.drawHud(game, v);
+    if (!backdrop) this.drawHud(game, v);
   }
 
   drawField(f) {
@@ -153,28 +154,30 @@ FB.Renderer = class {
     ctx.arc(p.x + 3, p.y + 4, p.r, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body. Stunned circles flash lighter.
+    // Body: team colour with this circle's own pattern on top. Stunned
+    // circles flash lighter.
     ctx.fillStyle = p.stun > 0 ? team.secondary : team.primary;
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fill();
+    ctx.save();
+    ctx.clip();
+    this.drawPattern(p, team);
+    ctx.restore();
     ctx.lineWidth = 3;
     ctx.strokeStyle = team.dark;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Goalies wear a band so they are easy to spot.
-    if (p.role === 'goalie') {
-      ctx.strokeStyle = team.secondary;
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r - 6, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 14px system-ui, sans-serif';
+    // Number, outlined so it reads on any pattern.
+    ctx.font = 'bold 13px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = team.dark;
+    ctx.strokeText(String(p.index + 1), p.x, p.y + 1);
+    ctx.fillStyle = '#ffffff';
     ctx.fillText(String(p.index + 1), p.x, p.y + 1);
 
     if (p.controlled) {
@@ -197,6 +200,50 @@ FB.Renderer = class {
       ctx.lineTo(p.x + 7, p.y - p.r - 22);
       ctx.closePath();
       ctx.fill();
+    }
+  }
+
+  // Draws a circle's pattern. Called with the circle as the clip region.
+  drawPattern(p, team) {
+    const ctx = this.ctx;
+    const { x, y, r } = p;
+    ctx.fillStyle = team.secondary;
+    ctx.strokeStyle = team.secondary;
+    switch (p.pattern) {
+      case 'rings':
+        ctx.lineWidth = 3;
+        for (const rr of [r * 0.75, r * 0.4]) {
+          ctx.beginPath();
+          ctx.arc(x, y, rr, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        break;
+      case 'stripes':
+        for (let i = -2; i <= 2; i += 2) ctx.fillRect(x - r, y + i * 6 - 2, r * 2, 4);
+        break;
+      case 'dots':
+        for (const [dx, dy] of [[-8, -8], [8, -8], [-8, 8], [8, 8], [0, 0]]) {
+          ctx.beginPath();
+          ctx.arc(x + dx, y + dy, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        break;
+      case 'halves':
+        ctx.fillRect(x, y - r, r, r * 2);
+        break;
+      case 'cross':
+        ctx.fillRect(x - 3, y - r, 6, r * 2);
+        ctx.fillRect(x - r, y - 3, r * 2, 6);
+        break;
+      case 'diagonal':
+        ctx.lineWidth = 4;
+        for (let i = -3; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(x - r + i * 10, y + r);
+          ctx.lineTo(x + r + i * 10, y - r);
+          ctx.stroke();
+        }
+        break;
     }
   }
 
@@ -242,24 +289,45 @@ FB.Renderer = class {
     ctx.fillText(right, cx + gap, y);
     ctx.textAlign = 'center';
 
+    // Match clock under the score.
+    const secs = Math.ceil(game.clock);
+    const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
+    ctx.font = `${14 * s}px system-ui, sans-serif`;
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(cx - 70 * s, y + 20 * s, 140 * s, 24 * s);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`${game.half === 1 ? '1st' : '2nd'} half  ${clock}`, cx, y + 32 * s);
+
     // The user's stats.
     const u = game.user;
     ctx.font = `${14 * s}px system-ui, sans-serif`;
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
     const by = this.canvas.height - Math.max(18 * s, (v.oy - 40 * v.scale));
-    const help = u.controlled
-      ? `You: #${u.index + 1}  ·  Speed ${u.speed}  ·  Power ${u.power}  ·  Hit Reset ${u.hitReset.toFixed(1)}s  ·  WASD move, Space pulse, B watch bots`
-      : 'Watching bots  ·  Press B to take control of Blue #5';
+    const help = game.mode === 'play'
+      ? `You: Blue #${u.index + 1}  ·  Speed ${u.speed}  ·  Power ${u.power}  ·  Hit Reset ${u.hitReset.toFixed(1)}s  ·  WASD move, Space pulse, Esc pause`
+      : 'Watching bots  ·  Esc pause';
     ctx.fillText(help, cx, by);
 
     if (game.state === 'goal') {
       const team = FB.CONFIG.teams[game.lastScorer];
-      ctx.font = `bold ${64 * s}px system-ui, sans-serif`;
-      ctx.lineWidth = 8 * s;
-      ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-      ctx.strokeText(`${team.name} scores!`, cx, this.canvas.height / 2);
-      ctx.fillStyle = team.secondary;
-      ctx.fillText(`${team.name} scores!`, cx, this.canvas.height / 2);
+      this.banner(`${team.name} scores!`, team.secondary);
+    } else if (game.state === 'halftime') {
+      this.banner('Half time', '#ffffff');
     }
+  }
+
+  banner(text, color) {
+    const ctx = this.ctx;
+    const s = this.dpr;
+    const cx = this.canvas.width / 2;
+    const cy = this.canvas.height / 2;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `bold ${64 * s}px system-ui, sans-serif`;
+    ctx.lineWidth = 8 * s;
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.strokeText(text, cx, cy);
+    ctx.fillStyle = color;
+    ctx.fillText(text, cx, cy);
   }
 };

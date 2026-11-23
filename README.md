@@ -6,11 +6,13 @@ A top-down 2D web game a bit like soccer. Two teams of six circles pass a ball a
 
 Open `index.html` in any modern browser. There is nothing to install or build.
 
+From the main menu, pick **Play with bots** to control Blue #5 with bots on both teams, or **Watch bots** to watch a bots-only match. A match is 6 minutes, made of two 3-minute halves. The clock stops while a goal is celebrated.
+
 | Key | Action |
 | --- | --- |
 | W A S D | Move your circle |
 | Space | Send out a pulse |
-| B | Hand your circle to a bot and watch (press again to take it back) |
+| Esc or P | Pause menu (Resume, Restart, Exit to main menu) |
 
 The pulse pushes the ball away from your circle, so line up behind the ball in the direction you want it to go. It also knocks back and briefly stuns nearby circles on the other team.
 
@@ -22,7 +24,7 @@ Every circle has three stats:
 - **Power** (1 to 10): how hard its pulse hits the ball and other circles.
 - **Hit Reset Time** (seconds): how long the pulse takes to recharge. The ring around your circle fills up as it recharges.
 
-Each team has one goalie, which can't leave its semicircle.
+Each team has one goalie, which can't leave its semicircle. Every circle on a team has its own pattern (rings, stripes, dots, halves, cross, diagonal), and the team keeps one colour scheme.
 
 ## Code layout
 
@@ -36,8 +38,8 @@ Each team has one goalie, which can't leave its semicircle.
 | `js/game.js` | Game state, collisions, goals and kickoff |
 | `js/render.js` | Drawing the field, circles and scoreboard |
 | `js/input.js` | Keyboard input |
-| `js/main.js` | Starts the game and runs the loop |
+| `js/main.js` | Main loop, main menu, pause menu and full-time screen |
 
 ## Status
 
-Done so far: the field, physics, one circle you control, and bots for every other circle. The match clock with halves and the menus are coming next.
+First version: a full 6-minute match with a main menu, pause menu, bots and one circle you can control. Next up is tuning the stats and bots.

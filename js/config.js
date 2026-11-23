@@ -44,6 +44,8 @@ FB.CONFIG = {
   },
 
   match: {
+    halfLength: 180,       // two halves of 3 minutes
+    halftimePause: 3.0,
     goalPause: 2.0,        // seconds the "Goal!" banner shows before kickoff
   },
 
@@ -62,15 +64,16 @@ FB.CONFIG = {
     },
   ],
 
-  // Six circles per team. Positions are fractions of the team's own half:
+  // Six circles per team, each with its own pattern drawn in the team's
+  // colours. Positions are fractions of the team's own half:
   // x = 0 is the team's goal line, x = 1 is the halfway line.
   roster: [
-    { role: 'goalie',   x: 0.04, y: 0.50, speed: 5, power: 8, hitReset: 1.0 },
-    { role: 'defender', x: 0.35, y: 0.28, speed: 6, power: 7, hitReset: 0.9 },
-    { role: 'defender', x: 0.35, y: 0.72, speed: 6, power: 7, hitReset: 0.9 },
-    { role: 'midfield', x: 0.62, y: 0.50, speed: 7, power: 5, hitReset: 0.6 },
-    { role: 'forward',  x: 0.86, y: 0.30, speed: 9, power: 5, hitReset: 0.7 },
-    { role: 'forward',  x: 0.86, y: 0.70, speed: 8, power: 6, hitReset: 0.8 },
+    { role: 'goalie',   x: 0.04, y: 0.50, speed: 5, power: 8, hitReset: 1.0, pattern: 'rings' },
+    { role: 'defender', x: 0.35, y: 0.28, speed: 6, power: 7, hitReset: 0.9, pattern: 'stripes' },
+    { role: 'defender', x: 0.35, y: 0.72, speed: 6, power: 7, hitReset: 0.9, pattern: 'dots' },
+    { role: 'midfield', x: 0.62, y: 0.50, speed: 7, power: 5, hitReset: 0.6, pattern: 'halves' },
+    { role: 'forward',  x: 0.86, y: 0.30, speed: 9, power: 5, hitReset: 0.7, pattern: 'cross' },
+    { role: 'forward',  x: 0.86, y: 0.70, speed: 8, power: 6, hitReset: 0.8, pattern: 'diagonal' },
   ],
 
   // Index in the roster of the circle the user controls.

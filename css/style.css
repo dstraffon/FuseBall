@@ -4,8 +4,97 @@ body {
   height: 100%;
   overflow: hidden;
   background: #0d1b12;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #fff;
 }
 
 canvas {
   display: block;
+  outline: none;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 14, 9, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.panel {
+  min-width: 300px;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  padding: 32px 36px;
+  border-radius: 16px;
+  background: rgba(16, 30, 22, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 6px;
+  font-size: 56px;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg, #2f80ed, #f2994a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+h2 {
+  margin: 0 0 18px;
+  font-size: 32px;
+}
+
+.tagline {
+  margin: 0 0 24px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.controls {
+  margin: 18px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.final {
+  margin: 0 0 22px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+button {
+  display: block;
+  width: 100%;
+  margin: 10px 0 0;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #2f80ed;
+  color: #fff;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+button:focus-visible {
+  outline: 3px solid #ffe27a;
+  outline-offset: 2px;
+}
+
+button.secondary {
+  background: rgba(255, 255, 255, 0.1);
 }
